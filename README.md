@@ -12,3 +12,10 @@ Adicione `QUARKUS_MONGODB_CONNECTION_STRING` nas variáveis de ambiente com a _s
 4. se a carteira zerar ele não pode bonificar ninguém. Após o ciclo de feedback todas as carteira são resetadas e o saldo volta pra X valor;
 5. o colaborador fica com o valor histórico da bonificação e o chefe pode usar como quiser pra justificar alguma coisa ou bonificar o funcionário de outra forma;
 6. não pode dar ponto pra si mesmo e não tem como ter dois usuários com CPF igual.
+
+### Default Values
+
+| Tabela | Campo | Valores Possíveis |
+|:------:|:-----:|:-----------------:|
+| feedbacks | tipoReconhecimento | "Priorizamos Pessoas", "Aprendizado e Melhoria Contínua", "Inovação", "Tecnologia com Propósito", "Gestão Orientada por Resultados" |
+| feedbacks | pontuacao | 100 (valeu!), 200 (mandou bem!) e 300 (UAU!) |
