@@ -40,7 +40,7 @@ public class FeedbackResource {
             usuarioDestino.update();
             usuarioRemetente.update();
 
-            feedback.comentario.setDataHora();
+            feedback.setDataHora();
             feedback.persist();
             
             return Response.status(201)
