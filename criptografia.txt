@@ -32,3 +32,49 @@ public class KeyGenerator {
         }
     }
 }
+
+import io.smallrye.jwt.build.Jwt;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.PrivateKey;
+import java.security.KeyFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+
+public class TokenGenerator {
+
+    public String generateToken(String username) throws Exception {
+        // Carregar a chave privada do arquivo
+        String privateKeyContent = new String(Files.readAllBytes(Paths.get("privateKey.pem")))
+            .replaceAll("\\n", "")
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "");
+
+        byte[] keyBytes = Base64.getDecoder().decode(privateKeyContent);
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = kf.generatePrivate(spec);
+
+        // Gerar o token JWT
+        return Jwt.issuer("https://example.com/issuer")
+                  .upn(username)
+                  .groups("User")
+                  .sign(privateKey);
+    }
+}
+
+@Inject
+JsonWebToken jwt;
+
+@GET
+@Path("/user-info")
+public String getUserInfo() {
+    return "User: " + jwt.getName() + ", Roles: " + jwt.getGroups();
+}
+
+@GET
+@Path("/secure")
+@RolesAllowed("user")
+public String secureEndpoint() {
+    return "This is a secure endpoint";
+}
