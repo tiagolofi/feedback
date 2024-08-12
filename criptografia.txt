@@ -9,6 +9,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+https://quarkus-faces-melloware-8a6a34c1.koyeb.app/ui/data/datatable/facets.xhtml?jfwid=3f3a9
+
 public class KeyGenerator {
 
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
