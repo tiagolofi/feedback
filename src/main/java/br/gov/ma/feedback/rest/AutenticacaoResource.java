@@ -3,6 +3,7 @@ package br.gov.ma.feedback.rest;
 import java.util.List;
 
 import br.gov.ma.feedback.mensageria.Mensagens;
+import br.gov.ma.feedback.modelos.CredenciaisLogin;
 import br.gov.ma.feedback.mongo.Credenciais;
 import br.gov.ma.feedback.mongo.Token;
 import br.gov.ma.feedback.seguranca.GeradorToken;
@@ -30,11 +31,11 @@ public class AutenticacaoResource {
     @POST
     @Path("/token")
     @PermitAll
-    public Response geraRetornaToken(Credenciais credenciais) throws Exception { 
+    public Response geraRetornaToken(CredenciaisLogin credenciaisLogin) throws Exception { 
 
-        if (Credenciais.verificaSenha(credenciais.cpf, credenciais.senha)) {
+        if (Credenciais.verificaSenha(credenciaisLogin.cpf, credenciaisLogin.senha)) {
 
-            credenciais.setAcessos(Credenciais.findByCpf(credenciais.cpf).acessos);
+            Credenciais credenciais = Credenciais.findByCpf(credenciaisLogin.cpf);
 
             String tokenGerado = geradorToken.geraToken(credenciais.cpf, credenciais.acessos);
 
