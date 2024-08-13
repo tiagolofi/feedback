@@ -1,7 +1,7 @@
-package br.gov.ma.feedback.rest;
+package br.gov.ma.feedback.seguranca;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
 @ApplicationPath("/")
-public class RegisterFilter extends Application {}
+public class FiltroAutorizacaoRegistro extends Application {}

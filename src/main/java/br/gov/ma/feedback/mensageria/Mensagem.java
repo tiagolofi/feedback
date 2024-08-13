@@ -1,16 +1,16 @@
-package br.gov.ma.feedback.modelos;
+package br.gov.ma.feedback.mensageria;
 
-public class Mensageria {
+public class Mensagem {
     
     public String mensagem;
     public Object objetoSerial;
 
-    public Mensageria(String mensagem, Object objetoSerial) {
+    public Mensagem(String mensagem, Object objetoSerial) {
         this.mensagem = mensagem;
         this.objetoSerial = objetoSerial;
     }
 
-    public Mensageria(String mensagem) {
+    public Mensagem(String mensagem) {
         this.mensagem = mensagem;
     }
 }

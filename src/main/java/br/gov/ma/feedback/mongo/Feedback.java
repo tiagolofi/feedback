@@ -20,6 +20,20 @@ public class Feedback extends PanacheMongoEntity {
     public String dataHora;
     public int pontuacao;
 
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
+    }
+
+    public void setTipoReconhecimento(String tipoReconhecimento) {
+        this.tipoReconhecimento = tipoReconhecimento;
+    }
+
+    public void setDataHora() {
+        ZonedDateTime dataHora = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.dataHora = dataHora.format(formatter);
+    }
+
     public static List<Feedback> listarComentariosByCpfDestino(String cpf) {
         return Feedback.list("cpfDestino", cpf);
     }
@@ -30,12 +44,6 @@ public class Feedback extends PanacheMongoEntity {
 
     public static Feedback listarComentarioById(String id){
         return findById(new ObjectId(id));
-    }
-    
-    public void setDataHora() {
-        ZonedDateTime dataHora = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        this.dataHora = dataHora.format(formatter);
     }
 
 }

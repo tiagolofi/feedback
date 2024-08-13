@@ -1,4 +1,4 @@
-package br.gov.ma.feedback.security;
+package br.gov.ma.feedback.seguranca;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
