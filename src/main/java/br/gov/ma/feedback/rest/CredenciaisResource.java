@@ -6,6 +6,7 @@ import br.gov.ma.feedback.mensageria.Mensagem;
 
 import br.gov.ma.feedback.mongo.Carteira;
 import br.gov.ma.feedback.mongo.Credenciais;
+import br.gov.ma.feedback.mongo.DadosUsuario;
 import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -121,6 +122,10 @@ public class CredenciaisResource {
     @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public Response remover(String cpf) {
         Credenciais.removerCpf(cpf);
+        Carteira carteira = Carteira.findByCpf(cpf);
+        carteira.delete();
+        DadosUsuario perfil = DadosUsuario.findByCpf(cpf);
+        perfil.delete();
         return Response.status(200)
             .entity(Mensagens.DELETADO.getMensagem())
             .build();
