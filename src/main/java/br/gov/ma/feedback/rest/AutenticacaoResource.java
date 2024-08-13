@@ -7,6 +7,7 @@ import br.gov.ma.feedback.modelos.CredenciaisLogin;
 import br.gov.ma.feedback.mongo.Credenciais;
 import br.gov.ma.feedback.mongo.Token;
 import br.gov.ma.feedback.seguranca.GeradorToken;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
@@ -31,6 +32,7 @@ public class AutenticacaoResource {
     @POST
     @Path("/token")
     @PermitAll
+    @Timed(value = "autenticacao", extraTags = {"assunto", "autenticacao", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public Response geraRetornaToken(CredenciaisLogin credenciaisLogin) throws Exception { 
 
         if (Credenciais.verificaSenha(credenciaisLogin.cpf, credenciaisLogin.senha)) {
@@ -57,6 +59,7 @@ public class AutenticacaoResource {
     @GET
     @Path("/tokens/{cpf}")
     @RolesAllowed({"system", "admin"})
+    @Timed(value = "autenticacao", extraTags = {"assunto", "auditoria", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public List<Token> retornaTokens(String cpf) {
         return Token.list("cpf", cpf);
     }

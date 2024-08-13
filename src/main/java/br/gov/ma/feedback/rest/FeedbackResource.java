@@ -7,6 +7,7 @@ import br.gov.ma.feedback.modelos.FeedbackEditarComentario;
 import br.gov.ma.feedback.mensageria.Mensagem;
 import br.gov.ma.feedback.mongo.Carteira;
 import br.gov.ma.feedback.mongo.Feedback;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
@@ -28,6 +29,7 @@ public class FeedbackResource {
     @POST
     @Path("/novo")
     @RolesAllowed("user")
+    @Timed(value = "feedback", extraTags = {"assunto", "negocio", "categoria", "cliente"}, percentiles = {0.95, 0.99})
     public Response novoFeedback(Feedback feedback) {
 
         if (feedback.cpfDestino.equals(feedback.cpfRemetente)) {
@@ -62,6 +64,7 @@ public class FeedbackResource {
     @GET
     @Path("/comentario/{id}")
     @RolesAllowed("user")
+    @Timed(value = "feedback", extraTags = {"assunto", "utilitario", "categoria", "developer"}, percentiles = {0.95, 0.99})
     public Feedback retornaComentarioById(String id) {
         return Feedback.listarComentarioById(id);
     }
@@ -69,6 +72,7 @@ public class FeedbackResource {
     @GET
     @Path("/comentarios-destino/{cpf}")
     @RolesAllowed("user")
+    @Timed(value = "feedback", extraTags = {"assunto", "utilitario", "categoria", "developer"}, percentiles = {0.95, 0.99})
     public List<Feedback> retornaComentariosDestino(String cpf) {
         return Feedback.listarComentariosByCpfDestino(cpf);
     }
@@ -76,6 +80,7 @@ public class FeedbackResource {
     @GET
     @Path("/comentarios-remetente/{cpf}")
     @RolesAllowed("user")
+    @Timed(value = "feedback", extraTags = {"assunto", "utilitario", "categoria", "developer"}, percentiles = {0.95, 0.99})
     public List<Feedback> retornaComentariosRementente(String cpf) {
         return Feedback.listarComentariosByCpfRemetente(cpf);
     }
@@ -83,6 +88,7 @@ public class FeedbackResource {
     @PUT
     @Path("/editar")
     @RolesAllowed({"user", "moderator"})
+    @Timed(value = "feedback", extraTags = {"assunto", "auditoria", "categoria", "cliente"}, percentiles = {0.95, 0.99})
     public Response editarFeedback(FeedbackEditarComentario feedbackCamposEditaveis) { 
         
         Feedback feedback = Feedback.listarComentarioById(feedbackCamposEditaveis.id);
@@ -101,6 +107,7 @@ public class FeedbackResource {
     @DELETE
     @Path("/remover/{id}")
     @RolesAllowed({"user", "moderator"})
+    @Timed(value = "feedback", extraTags = {"assunto", "negocio", "categoria", "cliente"}, percentiles = {0.95, 0.99})
     public Response removerComentario(String id) {
         Feedback feedback = Feedback.listarComentarioById(id);
 

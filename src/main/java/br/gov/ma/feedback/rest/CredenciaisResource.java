@@ -6,11 +6,13 @@ import br.gov.ma.feedback.mensageria.Mensagem;
 
 import br.gov.ma.feedback.mongo.Carteira;
 import br.gov.ma.feedback.mongo.Credenciais;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -22,11 +24,12 @@ import jakarta.ws.rs.core.Response;
 @Path("/usuario")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class UsuarioResource {
+public class CredenciaisResource {
 
     @POST
     @Path("/novo")
     @PermitAll
+    @Timed(value = "credencial", extraTags = {"assunto", "autenticacao", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public Response criar(Credenciais credenciais) {
         if (!credenciais.verificaCpfDuplicado() && credenciais.validarCpf()){
             
@@ -48,16 +51,58 @@ public class UsuarioResource {
             .build();
     }
 
+    @GET
+    @Path("/mostrar-acessos/{cpf}")
+    @RolesAllowed("user")
+    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    public CredencialEditarAcesso retornaAcessos(String cpf){
+        return Credenciais.findAcessos(cpf);
+    }
+
     @PUT
     @Path("/conceder-acessos")
     @RolesAllowed("admin")
+    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public Response atualizar(CredencialEditarAcesso credencialCamposEditaveis) {
 
         Credenciais credenciais = Credenciais.findByCpf(credencialCamposEditaveis.cpf);
         
         if (credenciais != null) {
 
-            credenciais.setAcessos(credencialCamposEditaveis.acessos);
+            for (String acesso : credencialCamposEditaveis.acessos) {
+                if (!credenciais.acessos.contains(acesso)) {
+                    credenciais.acessos.add(acesso);
+                }
+            }
+
+            credenciais.update();
+    
+            return Response.status(200)
+                .entity(Mensagens.ATUALIZADO.getMensagem())
+                .build();
+        }
+
+        return Response.status(400)
+            .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
+            .build();
+    }
+
+    @PUT
+    @Path("/revogar-acessos")
+    @RolesAllowed("admin")
+    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    public Response revogar(CredencialEditarAcesso credencialCamposEditaveis) {
+
+        Credenciais credenciais = Credenciais.findByCpf(credencialCamposEditaveis.cpf);
+        
+        if (credenciais != null) {
+
+            for (String acesso : credencialCamposEditaveis.acessos) {
+                if (credenciais.acessos.contains(acesso)) {
+                    credenciais.acessos.remove(acesso);
+                }
+            }
+
             credenciais.update();
     
             return Response.status(200)
@@ -71,8 +116,9 @@ public class UsuarioResource {
     }
 
     @DELETE
-    @Path("/apagar/{cpf}")
+    @Path("/remover/{cpf}")
     @RolesAllowed("admin")
+    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public Response remover(String cpf) {
         Credenciais.removerCpf(cpf);
         return Response.status(200)

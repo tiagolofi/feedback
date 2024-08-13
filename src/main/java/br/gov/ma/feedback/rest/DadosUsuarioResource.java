@@ -2,6 +2,7 @@ package br.gov.ma.feedback.rest;
 
 import br.gov.ma.feedback.mensageria.Mensagens;
 import br.gov.ma.feedback.mongo.DadosUsuario;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.Consumes;
@@ -23,6 +24,7 @@ public class DadosUsuarioResource {
     @POST
     @Path("/novo")
     @RolesAllowed("user")
+    @Timed(value = "perfil", extraTags = {"assunto", "negocio", "categoria", "cliente"}, percentiles = {0.95, 0.99})
     public Response informar(DadosUsuario dados) {
         dados.persist();
         return Response.status(201)
@@ -33,6 +35,7 @@ public class DadosUsuarioResource {
     @GET
     @Path("/consulta/{cpf}")
     @RolesAllowed("user")
+    @Timed(value = "perfil", extraTags = {"assunto", "utilitario", "categoria", "developer"}, percentiles = {0.95, 0.99})
     public DadosUsuario retornaUsuario(String cpf) {
         return DadosUsuario.findByCpf(cpf);
     }
@@ -40,6 +43,7 @@ public class DadosUsuarioResource {
     @PUT
     @Path("/editar") // editar o CPF irá perder o vínculo do usuário, resolva cadastrando um novo perfil ou reeditando
     @RolesAllowed("user")
+    @Timed(value = "perfil", extraTags = {"assunto", "negocio", "categoria", "cliente"}, percentiles = {0.95, 0.99})
     public Response atualizar(DadosUsuario dados) {
         dados.update();
         return Response.status(200)
@@ -50,6 +54,7 @@ public class DadosUsuarioResource {
     @DELETE
     @Path("/remover")
     @RolesAllowed("admin")
+    @Timed(value = "perfil", extraTags = {"assunto", "negocio", "categoria", "cliente"}, percentiles = {0.95, 0.99})
     public Response remover(DadosUsuario dados) {
         dados.delete();
         return Response.status(200)
