@@ -43,8 +43,8 @@ public class FeedbackResource {
 
         if (carteiraRemetente.saldoCarteira > 0) {
 
-            carteiraDestino.creditar(feedback.pontuacao);
-            carteiraRemetente.debitar(feedback.pontuacao);
+            carteiraDestino.creditarPontuacao(feedback.pontuacao);
+            carteiraRemetente.debitarSaldo(feedback.pontuacao);
 
             feedback.setDataHora();
             feedback.persist();
@@ -114,8 +114,8 @@ public class FeedbackResource {
         Carteira carteiraQueDevolve = Carteira.findByCpf(feedback.cpfDestino);
         Carteira carteiraQuePagou = Carteira.findByCpf(feedback.cpfRemetente);
 
-        carteiraQuePagou.creditar(feedback.pontuacao);
-        carteiraQueDevolve.debitar(feedback.pontuacao);
+        carteiraQuePagou.creditarSaldo(feedback.pontuacao);
+        carteiraQueDevolve.debitarPontuacao(feedback.pontuacao);
 
         feedback.delete();
 

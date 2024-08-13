@@ -52,12 +52,45 @@ public class CredenciaisResource {
             .build();
     }
 
+    @PUT
+    @Path("/troca-senha")
+    @RolesAllowed("admin")
+    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    public Response trocaSenha(Credenciais credenciais) {
+        Credenciais antigas = Credenciais.findByCpf(credenciais.cpf);
+        if (antigas != null) {
+            credenciais.id = antigas.id;
+            credenciais.setSenhaEncriptada();
+            credenciais.update();
+            return Response.status(200)
+                .entity(Mensagens.ATUALIZADO.getMensagem())
+                .build();
+        }
+        return Response.status(404)
+            .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
+            .build();
+    }
+
     @GET
     @Path("/mostrar-acessos/{cpf}")
     @RolesAllowed("user")
     @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
-    public CredencialEditarAcesso retornaAcessos(String cpf){
-        return Credenciais.findAcessos(cpf);
+    public Response retornaAcessos(String cpf){
+
+        Credenciais credenciais = Credenciais.findByCpf(cpf);
+
+        if (credenciais != null) {
+            CredencialEditarAcesso cEditarAcesso = new CredencialEditarAcesso();
+            cEditarAcesso.acessos = credenciais.acessos;
+            cEditarAcesso.cpf = cpf;
+            return Response.status(200)
+                .entity(cEditarAcesso)
+                .build();
+        }
+        return Response.status(404)
+            .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
+            .build();
+
     }
 
     @PUT
@@ -83,7 +116,7 @@ public class CredenciaisResource {
                 .build();
         }
 
-        return Response.status(400)
+        return Response.status(404)
             .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
             .build();
     }
@@ -111,7 +144,7 @@ public class CredenciaisResource {
                 .build();
         }
 
-        return Response.status(400)
+        return Response.status(404)
             .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
             .build();
     }
@@ -121,13 +154,29 @@ public class CredenciaisResource {
     @RolesAllowed("admin")
     @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
     public Response remover(String cpf) {
-        Credenciais.removerCpf(cpf);
-        Carteira carteira = Carteira.findByCpf(cpf);
-        carteira.delete();
-        DadosUsuario perfil = DadosUsuario.findByCpf(cpf);
-        perfil.delete();
-        return Response.status(200)
-            .entity(Mensagens.DELETADO.getMensagem())
+        Credenciais credenciais = Credenciais.findByCpf(cpf);
+
+        if (credenciais != null) {
+            credenciais.delete();
+            Carteira carteira = Carteira.findByCpf(cpf);
+            carteira.delete();
+
+            DadosUsuario perfil = DadosUsuario.findByCpf(cpf);
+            if (perfil != null) {
+                perfil.delete();
+                return Response.status(200)
+                    .entity(Mensagens.DELETADO.getMensagem())
+                    .build();
+            }
+
+            return Response.status(200)
+                .entity(Mensagens.DELETADO.getMensagem())
+                .build();
+
+        }
+
+        return Response.status(404)
+            .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
             .build();
     }
 

@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import br.gov.ma.feedback.modelos.CredencialEditarAcesso;
-
 @MongoEntity(collection = "usuarios")
 public class Credenciais extends PanacheMongoEntity {
     
@@ -44,14 +42,6 @@ public class Credenciais extends PanacheMongoEntity {
         return find("cpf", cpf).firstResult();
     }
 
-    public static CredencialEditarAcesso findAcessos(String cpf) {
-        Credenciais credenciais = find("cpf", cpf).firstResult();
-        CredencialEditarAcesso cEditarAcesso = new CredencialEditarAcesso();
-        cEditarAcesso.acessos = credenciais.acessos;
-        cEditarAcesso.cpf = cpf;
-        return cEditarAcesso;
-    }
-
     public boolean verificaCpfDuplicado(){
         Credenciais credenciais = findByCpf(cpf);
         if (credenciais != null && credenciais.cpf.equals(cpf)){
@@ -67,10 +57,6 @@ public class Credenciais extends PanacheMongoEntity {
             return true;
         }
         return false;
-    }
-
-    public static void removerCpf(String cpf) {
-        delete("cpf", cpf);
     }
 
 }

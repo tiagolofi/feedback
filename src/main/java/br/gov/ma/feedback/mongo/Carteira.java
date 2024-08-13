@@ -25,12 +25,22 @@ public class Carteira extends PanacheMongoEntity {
         update();
     }
 
-    public void creditar(int pontuacao) {
+    public void creditarPontuacao(int pontuacao) {
         this.pontosCarteira += pontuacao;
         update();
     }
+    
+    public void creditarSaldo(int pontuacao) {
+        this.saldoCarteira += pontuacao;
+        update();
+    }
 
-    public void debitar(int pontuacao){
+    public void debitarPontuacao(int pontuacao){
+        this.pontosCarteira -= pontuacao;
+        update();
+    }
+
+    public void debitarSaldo(int pontuacao){
         this.saldoCarteira -= pontuacao;
         update();
     }
