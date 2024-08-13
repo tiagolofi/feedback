@@ -2,8 +2,6 @@ package br.gov.ma.feedback.rest;
 
 import java.util.List;
 
-import javax.swing.text.Caret;
-
 import br.gov.ma.feedback.mensageria.Mensagem;
 import br.gov.ma.feedback.mongo.Carteira;
 import io.micrometer.core.annotation.Timed;
