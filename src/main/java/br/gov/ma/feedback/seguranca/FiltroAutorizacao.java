@@ -2,6 +2,8 @@ package br.gov.ma.feedback.seguranca;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -36,8 +38,10 @@ public class FiltroAutorizacao implements ContainerRequestFilter {
                 .build());
         }
 
-        if (!requestContext.getUriInfo().getPath().equals("/usuario/novo") && 
-                !requestContext.getUriInfo().getPath().equals("/autenticacao/token")) {
+        List<String> paths = Arrays.asList("/usuario/novo", "/autenticacao/token", "/usuario/solicita-troca-senha/", "/troca-senha");
+        String path = requestContext.getUriInfo().getPath();
+
+        if (!paths.stream().anyMatch(path::contains)) {
                 
             long expiresIn = jwt.getExpirationTime();
 

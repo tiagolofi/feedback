@@ -22,7 +22,7 @@ public class CarteiraResource {
     @GET
     @Path("/consulta/{cpf}")
     @RolesAllowed("user")
-    @Timed(value = "carteira", extraTags = {"assunto", "utilitario", "categoria", "developer"})
+    @Timed(value = "carteira", extraTags = {"path", "/consulta/{cpf}", "assunto", "utilitario", "categoria", "developer"})
     public Carteira retornaCarteira(String cpf) {
         return Carteira.findByCpf(cpf);
     }
@@ -30,7 +30,7 @@ public class CarteiraResource {
     @PUT
     @Path("/resetar")
     @RolesAllowed("system")
-    @Timed(value = "carteira", extraTags = {"assunto", "negocio", "categoria", "sistema"}, percentiles = {0.95, 0.99})
+    @Timed(value = "carteira", extraTags = {"path", "/resetar", "assunto", "negocio", "categoria", "sistema"}, percentiles = {0.5, 0.95, 0.99})
     public Response resetarCarteiras() {
         List<Carteira> carteiras = Carteira.listAll();
         for (Carteira carteira: carteiras) {

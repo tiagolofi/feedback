@@ -1,6 +1,7 @@
 package br.gov.ma.feedback.rest;
 
 import br.gov.ma.feedback.mensageria.Mensagens;
+import br.gov.ma.feedback.modelos.CredenciaisLogin;
 import br.gov.ma.feedback.modelos.CredencialEditarAcesso;
 import br.gov.ma.feedback.mensageria.Mensagem;
 
@@ -30,8 +31,9 @@ public class CredenciaisResource {
     @POST
     @Path("/novo")
     @PermitAll
-    @Timed(value = "credencial", extraTags = {"assunto", "autenticacao", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    @Timed(value = "credencial", extraTags = {"path", "/novo", "assunto", "autenticacao", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
     public Response criar(Credenciais credenciais) {
+
         if (!credenciais.verificaCpfDuplicado() && credenciais.validarCpf()){
             
             credenciais.setSenhaEncriptada();
@@ -53,14 +55,12 @@ public class CredenciaisResource {
     }
 
     @PUT
-    @Path("/troca-senha")
-    @RolesAllowed("admin")
-    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
-    public Response trocaSenha(Credenciais credenciais) {
-        Credenciais antigas = Credenciais.findByCpf(credenciais.cpf);
-        if (antigas != null) {
-            credenciais.id = antigas.id;
-            credenciais.setSenhaEncriptada();
+    @Path("/solicita-troca-senha/{cpf}")
+    @Timed(value = "credencial", extraTags = {"path", "/solicita-troca-senha/{cpf}", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
+    public Response solicitaTrocaSenha(String cpf) {
+        Credenciais credenciais = Credenciais.findByCpf(cpf);
+        if (credenciais != null) {
+            credenciais.solicitacaoTrocaSenha = true;
             credenciais.update();
             return Response.status(200)
                 .entity(Mensagens.ATUALIZADO.getMensagem())
@@ -71,10 +71,53 @@ public class CredenciaisResource {
             .build();
     }
 
+    @PUT
+    @Path("/bloqueia-senha/{cpf}")
+    @RolesAllowed("admin")
+    @Timed(value = "credencial", extraTags = {"path", "/bloqueia-senha/{cpf}", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
+    public Response bloqueiaSenha(String cpf) {
+        Credenciais credenciais = Credenciais.findByCpf(cpf);
+        if (credenciais != null) {
+            credenciais.bloqueado = true;
+            credenciais.update();
+            return Response.status(200)
+                .entity(Mensagens.ATUALIZADO.getMensagem())
+                .build();
+        }
+        return Response.status(404)
+            .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
+            .build();
+    }
+
+    @PUT
+    @Path("/troca-senha")
+    @Timed(value = "credencial", extraTags = {"path", "/troca-senha", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
+    public Response trocaSenha(CredenciaisLogin credenciaisLogin) {
+        Credenciais credenciais = Credenciais.findByCpf(credenciaisLogin.cpf);
+        if (credenciais != null) {
+            if (credenciais.solicitacaoTrocaSenha && credenciais.bloqueado) {
+                credenciais.bloqueado = false;
+                credenciais.solicitacaoTrocaSenha = false;
+                credenciais.senha = credenciaisLogin.senha;
+                credenciais.setSenhaEncriptada();
+                credenciais.update();
+                return Response.status(200)
+                    .entity(Mensagens.ATUALIZADO.getMensagem())
+                    .build();
+            }
+            return Response.status(401)
+                .entity(Mensagens.NAO_AUTORIZADO.getMensagem())
+                .build();
+        }
+        return Response.status(404)
+            .entity(Mensagens.CPF_NAO_ENCONTRADO.getMensagem())
+            .build();
+    }
+
     @GET
     @Path("/mostrar-acessos/{cpf}")
     @RolesAllowed("user")
-    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    @Timed(value = "credencial", extraTags = {"path", "/mostrar-acessos/{cpf}", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
     public Response retornaAcessos(String cpf){
 
         Credenciais credenciais = Credenciais.findByCpf(cpf);
@@ -96,7 +139,7 @@ public class CredenciaisResource {
     @PUT
     @Path("/conceder-acessos")
     @RolesAllowed("admin")
-    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    @Timed(value = "credencial", extraTags = {"path", "/conceder-acessos", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
     public Response atualizar(CredencialEditarAcesso credencialCamposEditaveis) {
 
         Credenciais credenciais = Credenciais.findByCpf(credencialCamposEditaveis.cpf);
@@ -124,7 +167,7 @@ public class CredenciaisResource {
     @PUT
     @Path("/revogar-acessos")
     @RolesAllowed("admin")
-    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    @Timed(value = "credencial", extraTags = {"path", "/revogar-acessos", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
     public Response revogar(CredencialEditarAcesso credencialCamposEditaveis) {
 
         Credenciais credenciais = Credenciais.findByCpf(credencialCamposEditaveis.cpf);
@@ -152,7 +195,7 @@ public class CredenciaisResource {
     @DELETE
     @Path("/remover/{cpf}")
     @RolesAllowed("admin")
-    @Timed(value = "credencial", extraTags = {"assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    @Timed(value = "credencial", extraTags = {"path", "/remover/{cpf}", "assunto", "negocio", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
     public Response remover(String cpf) {
         Credenciais credenciais = Credenciais.findByCpf(cpf);
 

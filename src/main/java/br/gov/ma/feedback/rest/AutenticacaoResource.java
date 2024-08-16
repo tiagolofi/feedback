@@ -1,7 +1,6 @@
 package br.gov.ma.feedback.rest;
 
 import java.util.List;
-
 import br.gov.ma.feedback.mensageria.Mensagens;
 import br.gov.ma.feedback.modelos.CredenciaisLogin;
 import br.gov.ma.feedback.mongo.Credenciais;
@@ -32,12 +31,18 @@ public class AutenticacaoResource {
     @POST
     @Path("/token")
     @PermitAll
-    @Timed(value = "autenticacao", extraTags = {"assunto", "autenticacao", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
-    public Response geraRetornaToken(CredenciaisLogin credenciaisLogin) throws Exception { 
+    @Timed(value = "autenticacao", extraTags = {"path", "/token", "assunto", "autenticacao", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
+    public Response geraToken(CredenciaisLogin credenciaisLogin) throws Exception { 
 
         if (Credenciais.verificaSenha(credenciaisLogin.cpf, credenciaisLogin.senha)) {
 
             Credenciais credenciais = Credenciais.findByCpf(credenciaisLogin.cpf);
+
+            if (credenciais.bloqueado) {
+                return Response.status(401)
+                    .entity(Mensagens.NAO_AUTORIZADO.getMensagem())
+                    .build();
+            }
 
             String tokenGerado = geradorToken.geraToken(credenciais.cpf, credenciais.acessos);
 
@@ -59,7 +64,7 @@ public class AutenticacaoResource {
     @GET
     @Path("/tokens/{cpf}")
     @RolesAllowed({"system", "admin"})
-    @Timed(value = "autenticacao", extraTags = {"assunto", "auditoria", "categoria", "seguranca"}, percentiles = {0.95, 0.99})
+    @Timed(value = "autenticacao", extraTags = {"path", "/tokens/{cpf}", "assunto", "auditoria", "categoria", "seguranca"}, percentiles = {0.5, 0.95, 0.99})
     public List<Token> retornaTokens(String cpf) {
         return Token.list("cpf", cpf);
     }

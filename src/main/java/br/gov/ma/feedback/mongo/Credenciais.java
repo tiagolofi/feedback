@@ -15,6 +15,8 @@ public class Credenciais extends PanacheMongoEntity {
     public String cpf;
     public String senha;
     public Set<String> acessos; // admin, user, moderator, system
+    public boolean bloqueado = false;
+    public boolean solicitacaoTrocaSenha = false;
 
     public void setSenhaEncriptada() {
         this.senha = encriptaSenha(senha);
