@@ -34,7 +34,7 @@ public class FiltroAutorizacao implements ContainerRequestFilter {
 
         if (tokenAutorizacaoHeader == null || !tokenAutorizacaoHeader.equals(tokenAutorizacao)) {
             requestContext.abortWith(Response.status(401)
-                .entity(Mensagens.NAO_AUTORIZADO.getMensagem())
+                .entity(Mensagens.NAO_AUTORIZADO_HEADER.getMensagem())
                 .build());
         }
 

@@ -6,6 +6,7 @@ public enum Mensagens {
     AUTORIZADO(new Mensagem("Acesso autorizado")),
     TOKEN_EXPIRADO(new Mensagem("Token expirado!")),
     NAO_AUTORIZADO(new Mensagem("Acesso não autorizado")),
+    NAO_AUTORIZADO_HEADER(new Mensagem("Acesso não autorizado, header inválido ou vazio")),
     CPF_NAO_ENCONTRADO(new Mensagem("CPF não encontrado")),
     DELETADO(new Mensagem("As informações foram apagadas")),
     ATUALIZADO(new Mensagem("As informações foram atualizadas")),
