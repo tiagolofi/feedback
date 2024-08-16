@@ -9,6 +9,8 @@ Esta aplicação oferece a infraestrutura de _backend_ para um sistema de feedba
 - `PUBLIC_KEY`: chave pública para ler o token JWT;
 - `PRIVATE_KEY`: chave privada para criptografar o token.
 
+OBS: as chaves podem ser geradas com `br.gov.ma.feedback.seguranca.GerarChaves`;
+
 ### Regra de negócio
 
 1. Jornada do Colaborador
