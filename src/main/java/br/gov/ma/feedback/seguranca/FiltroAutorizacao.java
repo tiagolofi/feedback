@@ -7,8 +7,11 @@ import java.util.List;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.logging.Logger;
 
 import br.gov.ma.feedback.mensageria.Mensagens;
+import io.smallrye.jwt.auth.principal.DefaultJWTParser;
+import io.smallrye.jwt.auth.principal.ParseException;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
@@ -26,7 +29,7 @@ public class FiltroAutorizacao implements ContainerRequestFilter {
 
     @Inject
     JsonWebToken jwt;
-    
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
@@ -42,18 +45,16 @@ public class FiltroAutorizacao implements ContainerRequestFilter {
         String path = requestContext.getUriInfo().getPath();
 
         if (!paths.stream().anyMatch(path::contains)) {
-                
+
             long expiresIn = jwt.getExpirationTime();
-
-            long now = Instant.now().toEpochMilli() / 1000;
-
+            long now = Instant.now().getEpochSecond();
+            
             if (expiresIn < now) {
                 requestContext.abortWith(Response.status(401)
                     .entity(Mensagens.TOKEN_EXPIRADO.getMensagem())
                     .build());
             }
+
         }
-
     }
-
 }
