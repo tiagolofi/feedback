@@ -32,9 +32,8 @@ public class FotosResource {
             Foto foto = new Foto();
 
             foto.cpf = form.cpf;
-            foto.contentType = form.contentType;
+            foto.filename = form.filename;
             foto.data = form.data;
-            foto.setFilename();
             foto.persist();
     
             return Response.status(201)

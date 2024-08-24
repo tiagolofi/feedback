@@ -11,9 +11,9 @@ public class FotoForm {
     @PartType(MediaType.TEXT_PLAIN)
     public String cpf;
 
-    @RestForm("contentType")
+    @RestForm("filename")
     @PartType(MediaType.TEXT_PLAIN)
-    public String contentType;
+    public String filename;
 
     @RestForm("data")
     @PartType(MediaType.APPLICATION_OCTET_STREAM)
