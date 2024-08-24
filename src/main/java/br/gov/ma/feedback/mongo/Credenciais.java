@@ -52,13 +52,4 @@ public class Credenciais extends PanacheMongoEntity {
         return false;
     }
 
-    public static boolean verificaSenhaLogin(String cpf, String senhaAberta) {
-        String senhaEncriptada = encriptaSenha(senhaAberta);
-        Credenciais credenciais = findByCpf(cpf);
-        if (credenciais != null && credenciais.senha.equals(senhaEncriptada)){
-            return true;
-        }
-        return false;
-    }
-
 }

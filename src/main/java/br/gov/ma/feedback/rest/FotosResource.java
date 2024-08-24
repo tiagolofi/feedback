@@ -1,7 +1,5 @@
 package br.gov.ma.feedback.rest;
 
-import org.jboss.resteasy.reactive.MultipartForm;
-
 import br.gov.ma.feedback.mensageria.Mensagem;
 import br.gov.ma.feedback.mensageria.Mensagens;
 import br.gov.ma.feedback.modelos.FotoForm;
@@ -28,7 +26,7 @@ public class FotosResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @Timed(value = "foto", extraTags = {"path", "/foto/nova", "assunto", "negocio", "categoria", "cliente"}, percentiles = {0.5, 0.95, 0.99})
-    public Response uploadFoto(@MultipartForm FotoForm form){
+    public Response uploadFoto(FotoForm form){
 
         try {
             Foto foto = new Foto();
